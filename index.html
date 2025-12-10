@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Vida em Palavras | App</title>
+    <link href="fonts.googleapis.com" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+
+    <header>
+        <div class="container nav-container">
+            <div class="logo">Minha Vida em Palavras</div>
+            <nav class="nav-links">
+                <ul>
+                    <li class="nav-item hidden-item"><a href="#" onclick="showSection('dashboard')">Menu Inicial</a></li>
+                    <li class="nav-item hidden-item"><a href="#" onclick="showSection('editor')">Escrever</a></li>
+                    <!-- Novo link para Livros Concluídos -->
+                    <li class="nav-item hidden-item"><a href="#" onclick="showSection('finished')">Concluídos</a></li>
+                    <li class="nav-item hidden-item"><a href="#" onclick="logout()" class="btn-logout">Sair</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <!-- === TELA INICIAL: LOGIN/AUTENTICAÇÃO (Visível por padrão) === -->
+        <section id="auth-screen" class="app-screen active-screen">
+            <div class="auth-card">
+                <div id="login-container">
+                    <h2>Entre na Sua Conta</h2>
+                    <p>Continue de onde parou ou crie uma conta nova.</p>
+                    <div class="social-login">
+                        <button class="social-btn google-btn">Google 🚀</button>
+                        <button class="social-btn apple-btn">iCloud/Apple ☁️</button>
+                    </div>
+                    <hr>
+                    <input type="email" placeholder="Seu e-mail">
+                    <input type="password" placeholder="Sua senha">
+                    <button onclick="login()" class="cta-button">ENTRAR</button>
+                    <a href="#" class="toggle-auth" onclick="toggleAuthMode(false)">Ainda não tem conta? Cadastrar</a>
+                </div>
+
+                <div id="register-container" class="hidden">
+                    <h2>Crie Sua Conta</h2>
+                    <p>É rápido e gratuito.</p>
+                    <input type="text" placeholder="Seu nome">
+                    <input type="email" placeholder="Seu e-mail">
+                    <input type="password" placeholder="Crie uma senha forte">
+                    <button onclick="register()" class="cta-button">CADASTRAR</button>
+                    <a href="#" class="toggle-auth" onclick="toggleAuthMode(true)">Já tem conta? Fazer Login</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- === PAINEL DO USUÁRIO LOGADO (Meus Rascunhos) === -->
+        <section id="dashboard" class="app-screen hidden-screen">
+            <div class="dashboard-card">
+                <h2>Rascunhos Atuais</h2>
+                <p>Continue de onde parou ou finalize um livro.</p>
+                <div id="draft-list" class="book-list">
+                    <!-- Rascunhos serão listados aqui -->
+                    <div class="book-card" data-book-id="1" onclick="showSection('editor')">
+                        <h3>Minhas Memórias (Rascunho)</h3>
+                        <p>Progresso: 0 palavras</p>
+                        <button onclick="event.stopPropagation(); openFinishModal(1)" class="action-btn download-btn" style="margin-top: 10px;">Finalizar Livro</button>
+                    </div>
+                </div>
+                <button onclick="showSection('editor')" class="cta-button" style="margin-top: 20px;">+ Novo Livro</button>
+            </div>
+        </section>
+
+        <!-- === TELA DE EDIÇÃO COM ESTRUTURA DE LIVRO (Oculto por padrão) === -->
+        <section id="editor" class="app-screen hidden-screen">
+            <h2>Editor: Minhas Memórias</h2>
+            <div class="editor-layout">
+                <div class="sidebar-chapters">
+                    <h3>Capítulos</h3>
+                    <ul id="chapter-list"></ul>
+                    <button class="tip-button" style="width: 100%; margin-top: 10px;">+ Novo Capítulo</button>
+                </div>
+                <div class="main-editor-area">
+                    <h4>Editando: Rascunho Atual</h4>
+                    <textarea id="story-editor" rows="15" placeholder="Escreva o conteúdo do capítulo aqui..."></textarea>
+                    <p id="word-count">0 palavras</p>
+                    <div class="editor-actions">
+                        <button onclick="saveBook()" class="action-btn save-btn">Salvar</button>
+                        <button onclick="downloadPdf()" class="action-btn download-btn">Baixar PDF</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- === TELA DE LIVROS CONCLUÍDOS === -->
+        <section id="finished" class="app-screen hidden-screen">
+            <div class="dashboard-card">
+                <h2>Livros Concluídos</h2>
+                <p>Seus livros finalizados com capas personalizadas.</p>
+                <div id="finished-books-list" class="book-list finished-view">
+                    <!-- Livros concluídos serão listados aqui -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ESTRUTURA DO MODAL (POP-UP) DE NOVO CAPÍTULO -->
+    <div id="chapterModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeChapterModal()">&times;</span>
+            <h3>Novo Capítulo</h3>
+            <p>Defina os princípios deste novo segmento do seu livro.</p>
+            <input type="text" id="chapter-title-input" placeholder="Título do Capítulo (Ex: Capítulo 1 - O Início)">
+            <input type="text" id="chapter-narrator-input" placeholder="Quem é o narrador? (Ex: Primeira pessoa, Fulano)">
+            <input type="text" id="chapter-setting-input" placeholder="Onde se passa a história? (Ex: Camaçari, Bahia, 2025)">
+            <button onclick="saveNewChapter()" class="cta-button" style="margin-top: 15px;">SALVAR CAPÍTULO</button>
+        </div>
+    </div>
+
+    <!-- ESTRUTURA DO MODAL DE FINALIZAÇÃO E UPLOAD DE CAPA (NOVO) -->
+    <div id="coverUploadModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeCoverModal()">&times;</span>
+            <h3>Finalizar Livro e Adicionar Capa</h3>
+            <p>Parabéns por finalizar seu livro! Agora, adicione uma capa personalizada.</p>
+            
+            <div class="cover-preview" id="cover-preview">
+                Pré-visualização da Capa
+            </div>
+            
+            <input type="file" id="cover-upload-input" accept="image/png, image/jpeg" style="display: none;">
+            <button onclick="document.getElementById('cover-upload-input').click()" class="action-btn menu-btn" style="margin-top: 15px;">Upload da Foto do Dispositivo</button>
+
+            <button onclick="finishBookWithCover()" class="cta-button">Concluir Livro</button>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+
+</body>
+</html>
